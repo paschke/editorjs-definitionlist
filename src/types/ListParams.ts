@@ -1,82 +1,28 @@
-import type { ItemMeta } from './ItemMeta';
-import type { OlCounterType } from './OlCounterType';
+import type { DefinitionListItem } from './ItemMeta';
 
 /**
- * list style to make list as ordered or unordered
+ * List style — definition list only
  */
-export type ListDataStyle = 'ordered' | 'unordered' | 'checklist';
+export type ListDataStyle = 'definition';
 
 /**
- * Interface that represents data of the List tool
+ * Interface that represents data of the DefinitionList tool
  */
-export type ListData = Omit<ListItem, 'content'> & {
+export interface ListData {
   /**
    * Style of the list tool
    */
   style: ListDataStyle;
-};
-
-/**
- * Interface that represents data of the List tool
- */
-export interface OldListData {
-  /**
-   * Style of the List tool
-   */
-  style: 'ordered' | 'unordered';
-  /**
-   * Array of items of the List tool
-   */
-  items: string[];
-}
-
-/**
- * Type that represents data of the List tool
- */
-export type OldNestedListData = Omit<ListData, 'meta'>;
-
-/**
- * Interface that represents old checklist data format
- */
-export interface OldChecklistData {
-  /**
-   * Checklist items
-   */
-  items: OldChecklistItem[];
-}
-
-/**
- * Interface that represents old checklist item format
- */
-interface OldChecklistItem {
-  /**
-   * Text of the checklist item
-   */
-  text: string;
-  /**
-   * Checked state of the checklist item
-   */
-  checked: boolean;
-}
-
-/**
- * List item within the output data
- */
-export interface ListItem {
-  /**
-   * list item text content
-   */
-  content: string;
 
   /**
-   * Meta information of each list item
+   * Meta information of the list block itself
    */
-  meta: ItemMeta;
+  meta: Record<string, never>;
 
   /**
-   * sublist items
+   * Array of definition list items, each containing a term and description pair
    */
-  items: ListItem[];
+  items: DefinitionListItem[];
 }
 
 /**
@@ -84,19 +30,7 @@ export interface ListItem {
  */
 export interface ListConfig {
   /**
-   * default list style: ordered or unordered
-   * default is unordered
+   * default list style — always 'definition'
    */
   defaultStyle?: ListDataStyle;
-  /**
-   * Max level of the nesting in list
-   * If nesting is not needed, it could be set to 1
-   */
-  maxLevel?: number;
-  /**
-   * Specifies which counter types should be shown in the ordered list style selector.
-   * @example ['numeric', 'upper-roman'] // Shows selector with these two options
-   * @default undefined // All counter types are available when not specified
-   */
-  counterTypes?: OlCounterType[];
 }

@@ -46,11 +46,11 @@ export interface ListRendererInterface<ItemMeta> {
   renderWrapper: (isRoot: boolean) => HTMLElement;
 
   /**
-   * Redners list item element
-   * @param content - content of the list item
+   * Renders a list item element from the given item data
+   * @param item - item data object
    * @returns - created html list item element
    */
-  renderItem: (content: string, meta: ItemMeta) => HTMLElement;
+  renderItem: (item: ItemMeta) => HTMLElement;
 
   /**
    * Return the item content

@@ -1,6 +1,4 @@
-import { CheckListRenderer } from './ChecklistRenderer';
-import { OrderedListRenderer } from './OrderedListRenderer';
-import { UnorderedListRenderer } from './UnorderedListRenderer';
+import { DefinitionListRenderer } from './DefinitionListRenderer';
 import { DefaultListCssClasses } from './ListRenderer';
 
-export { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer, DefaultListCssClasses };
+export { DefinitionListRenderer, DefaultListCssClasses };

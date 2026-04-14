@@ -1,6 +1,6 @@
-import type { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer } from '../ListRenderer';
+import type { DefinitionListRenderer } from '../ListRenderer';
 
 /**
  * Type that represents all possible list renderer types
  */
-export type ListRenderer = CheckListRenderer | OrderedListRenderer | UnorderedListRenderer;
+export type ListRenderer = DefinitionListRenderer;

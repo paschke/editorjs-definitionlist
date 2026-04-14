@@ -1,35 +1,29 @@
 import type { API, BlockAPI, PasteConfig, ToolboxConfig } from '@editorjs/editorjs';
 import type {
   BlockToolConstructorOptions,
-  MenuConfigItem,
   ToolConfig
 } from '@editorjs/editorjs/types/tools';
-import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
-import { IconStartWith } from './styles/icons/index.js';
-import type { ListConfig, ListData, ListDataStyle, ListItem, OldListData } from './types/ListParams';
+import type { ListConfig, ListData } from './types/ListParams';
+import type { DefinitionListItem } from './types/ItemMeta';
 import ListTabulator from './ListTabulator';
-import { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer } from './ListRenderer';
+import { DefinitionListRenderer } from './ListRenderer';
 import type { ListRenderer } from './types/ListRenderer';
-import { renderToolboxInput } from './utils/renderToolboxInput';
-import { OlCounterIconsMap, type OlCounterType, OlCounterTypesMap } from './types/OlCounterType';
+import normalizeData from './utils/normalizeData';
+import type { PasteEvent } from './types';
 
 /**
  * Build styles
  */
 import './styles/list.pcss';
-import './styles/input.pcss';
-import stripNumbers from './utils/stripNumbers';
-import normalizeData from './utils/normalizeData';
-import type { PasteEvent } from './types';
-import type { OrderedListItemMeta } from './types/ItemMeta';
 
 /**
- * Constructor Params for Editorjs List Tool, use to pass initial data and settings
+ * Constructor Params for Editorjs DefinitionList Tool
  */
-export type ListParams = BlockToolConstructorOptions<ListData | OldListData, ListConfig>;
+export type ListParams = BlockToolConstructorOptions<ListData, ListConfig>;
 
 /**
- * Default class of the component used in editor
+ * Definition List Tool for Editor.js
+ * Renders a <dl> element with <dt> (term) and <dd> (description) items
  */
 export default class EditorjsList {
   /**
@@ -40,7 +34,7 @@ export default class EditorjsList {
   }
 
   /**
-   * Allow to use native Enter behaviour
+   * Allow use of native Enter behavior
    */
   public static get enableLineBreaks(): boolean {
     return true;
@@ -48,107 +42,65 @@ export default class EditorjsList {
 
   /**
    * Get Tool toolbox settings
-   * icon - Tool icon's SVG
-   * title - title to show in toolbox
    */
   public static get toolbox(): ToolboxConfig {
     return [
       {
-        icon: IconListBulleted,
-        title: 'Unordered List',
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>',
+        title: 'Definition List',
         data: {
-          style: 'unordered',
-        },
-      },
-      {
-        icon: IconListNumbered,
-        title: 'Ordered List',
-        data: {
-          style: 'ordered',
-        },
-      },
-      {
-        icon: IconChecklist,
-        title: 'Checklist',
-        data: {
-          style: 'checklist',
+          style: 'definition',
         },
       },
     ];
   }
 
   /**
-   * On paste sanitzation config. Allow only tags that are allowed in the Tool.
+   * On paste sanitization config. Allow only tags that are allowed in the Tool.
    * @returns - paste config object used in editor
    */
   public static get pasteConfig(): PasteConfig {
     return {
-      tags: ['OL', 'UL', 'LI'],
+      tags: ['DL', 'DT', 'DD'],
     };
   }
 
   /**
-   * Convert from text to list with import and export list to text
+   * Convert from definition list to text and back
    */
   public static get conversionConfig(): {
     /**
-     * Method that is responsible for conversion from data to string
+     * Joins all item contents into a single string
      * @param data - current list data
      * @returns - contents string formed from list data
      */
     export: (data: ListData) => string;
 
     /**
-     * Method that is responsible for conversion from string to data
-     * @param content - contents string
-     * @returns - list data formed from contents string
+     * Creates a single-item definition list from a plain string
+     * @param content - plain text string to import
+     * @param config - tool configuration
+     * @returns - list data formed from content string
      */
     import: (content: string, config: ToolConfig<ListConfig>) => ListData;
   } {
     return {
       export: (data) => {
-        return EditorjsList.joinRecursive(data);
+        return data.items.map(item => `${item.term}: ${item.description}`).join(' ');
       },
-      import: (content, config) => {
+      import: (content, _config) => {
         return {
+          style: 'definition',
           meta: {},
           items: [
             {
-              content,
-              meta: {},
-              items: [],
-            },
+              term: content,
+              description: '',
+            } as DefinitionListItem,
           ],
-          style: config?.defaultStyle !== undefined ? config.defaultStyle : 'unordered',
         };
       },
     };
-  }
-
-  /**
-   * Get list style name
-   */
-  private get listStyle(): ListDataStyle {
-    return this.data.style || this.defaultListStyle;
-  }
-
-  /**
-   * Set list style
-   * @param style - new style to set
-   */
-  private set listStyle(style: ListDataStyle) {
-    this.data.style = style;
-
-    this.changeTabulatorByStyle();
-
-    /**
-     * Create new list element
-     */
-    const newListElement = this.list!.render();
-
-    this.listElement?.replaceWith(newListElement);
-
-    this.listElement = newListElement;
   }
 
   /**
@@ -157,7 +109,7 @@ export default class EditorjsList {
   private api: API;
 
   /**
-   * Is Ediotrjs List Tool read-only
+   * Is EditorJS List Tool read-only?
    */
   private readOnly: boolean;
 
@@ -165,16 +117,6 @@ export default class EditorjsList {
    * Tool's configuration
    */
   private config: ListConfig | undefined;
-
-  /**
-   * Default list style formes as passed default list style from config or 'ordered' as default
-   */
-  private defaultListStyle?: ListConfig['defaultStyle'];
-
-  /**
-   * Default Counter type of the ordered list
-   */
-  private defaultCounterTypes: OlCounterType[];
 
   /**
    * Tool's data
@@ -192,17 +134,13 @@ export default class EditorjsList {
   private list: ListTabulator<ListRenderer> | undefined;
 
   /**
-   * Main constant wrapper of the whole list
+   * Main wrapper element of the whole list
    */
   private listElement: HTMLElement | undefined;
 
   /**
-   * Render plugin`s main Element and fill it with saved data
+   * Render plugin's main Element and fill it with saved data
    * @param params - tool constructor options
-   * @param params.data - previously saved data
-   * @param params.config - user config for Tool
-   * @param params.api - Editor.js API
-   * @param params.readOnly - read-only mode flag
    */
   constructor({ data, config, api, readOnly, block }: ListParams) {
     this.api = api;
@@ -210,43 +148,24 @@ export default class EditorjsList {
     this.config = config;
     this.block = block;
 
-    /**
-     * Set the default list style from the config or presetted 'unordered'.
-     */
-    this.defaultListStyle = this.config?.defaultStyle || 'unordered';
-
-    /**
-     * Set the default counter types for the ordered list
-     */
-    this.defaultCounterTypes = (this.config as ListConfig).counterTypes || Array.from(OlCounterTypesMap.values()) as OlCounterType[];
-
-    const initialData = {
-      style: this.defaultListStyle,
+    const initialData: ListData = {
+      style: 'definition',
       meta: {},
       items: [],
     };
 
     this.data = Object.keys(data).length ? normalizeData(data) : initialData;
 
-    /**
-     * Assign default value of the property for the ordered list
-     */
-    if (this.listStyle === 'ordered' && (this.data.meta as OrderedListItemMeta).counterType === undefined) {
-      (this.data.meta as OrderedListItemMeta).counterType = 'numeric';
-    }
-
-    this.changeTabulatorByStyle();
-  }
-
-  /**
-   * Convert from list to text for conversionConfig
-   * @param data - current data of the list
-   * @returns - string of the recursively merged contents of the items of the list
-   */
-  private static joinRecursive(data: ListData | ListItem): string {
-    return data.items
-      .map(item => `${item.content} ${EditorjsList.joinRecursive(item)}`)
-      .join('');
+    this.list = new ListTabulator<DefinitionListRenderer>(
+      {
+        data: this.data,
+        readOnly: this.readOnly,
+        api: this.api,
+        config: this.config,
+        block: this.block,
+      },
+      new DefinitionListRenderer(this.readOnly, this.config)
+    );
   }
 
   /**
@@ -270,7 +189,7 @@ export default class EditorjsList {
   }
 
   /**
-   * Function that is responsible for mergind two lists into one
+   * Function that is responsible for merging two lists into one
    * @param data - data of the next standing list, that should be merged with current
    */
   public merge(data: ListData): void {
@@ -278,203 +197,10 @@ export default class EditorjsList {
   }
 
   /**
-   * Creates Block Tune allowing to change the list style
-   * @returns array of tune configs
-   */
-  public renderSettings(): MenuConfigItem[] {
-    const defaultTunes: MenuConfigItem[] = [
-      {
-        label: this.api.i18n.t('Unordered'),
-        icon: IconListBulleted,
-        closeOnActivate: true,
-        isActive: this.listStyle == 'unordered',
-        onActivate: () => {
-          this.listStyle = 'unordered';
-        },
-      },
-      {
-        label: this.api.i18n.t('Ordered'),
-        icon: IconListNumbered,
-        closeOnActivate: true,
-        isActive: this.listStyle == 'ordered',
-        onActivate: () => {
-          this.listStyle = 'ordered';
-        },
-      },
-      {
-        label: this.api.i18n.t('Checklist'),
-        icon: IconChecklist,
-        closeOnActivate: true,
-        isActive: this.listStyle == 'checklist',
-        onActivate: () => {
-          this.listStyle = 'checklist';
-        },
-      },
-    ];
-
-    if (this.listStyle === 'ordered') {
-      const startWithElement = renderToolboxInput(
-        (index: string) => this.changeStartWith(Number(index)),
-        {
-          value: String((this.data.meta as OrderedListItemMeta).start ?? 1),
-          placeholder: '',
-          attributes: {
-            required: 'true',
-          },
-          sanitize: input => stripNumbers(input),
-        });
-
-      const orderedListTunes: MenuConfigItem[] = [
-        {
-          label: this.api.i18n.t('Start with'),
-          icon: IconStartWith,
-          children: {
-            items: [
-              {
-                element: startWithElement,
-                // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
-                type: 'html',
-              },
-            ],
-          },
-        },
-      ];
-
-      const orderedListCountersTunes: MenuConfigItem = {
-        label: this.api.i18n.t('Counter type'),
-        icon: OlCounterIconsMap.get((this.data.meta as OrderedListItemMeta).counterType!),
-        children: {
-          items: [],
-        },
-      };
-
-      /**
-       * For each counter type in OlCounterType create toolbox item
-       */
-      OlCounterTypesMap.forEach((_, counterType: string) => {
-        const counterTypeValue = OlCounterTypesMap.get(counterType)! as OlCounterType;
-
-        if (!this.defaultCounterTypes.includes(counterTypeValue)) {
-          return;
-        }
-
-        orderedListCountersTunes.children.items!.push({
-          title: this.api.i18n.t(counterType),
-          icon: OlCounterIconsMap.get(counterTypeValue),
-          isActive: (this.data.meta as OrderedListItemMeta).counterType === OlCounterTypesMap.get(counterType),
-          closeOnActivate: true,
-          onActivate: () => {
-            this.changeCounters(OlCounterTypesMap.get(counterType) as OlCounterType);
-          },
-        });
-      });
-
-      /**
-       * Dont show Counter type tune if there is no valid counter types
-       */
-      if (orderedListCountersTunes.children.items!.length > 1) {
-        orderedListTunes.push(orderedListCountersTunes);
-      }
-
-      // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
-      defaultTunes.push({ type: 'separator' }, ...orderedListTunes);
-    }
-
-    return defaultTunes;
-  }
-
-  /**
-   * On paste callback that is fired from Editor.
+   * On paste callback that is fired from Editor
    * @param event - event with pasted data
    */
   public onPaste(event: PasteEvent): void {
-    const { tagName: tag } = event.detail.data;
-
-    switch (tag) {
-      case 'OL':
-        this.listStyle = 'ordered';
-        break;
-      case 'UL':
-      case 'LI':
-        this.listStyle = 'unordered';
-    }
-
     this.list!.onPaste(event);
-  }
-
-  /**
-   * Handle UL, OL and LI tags paste and returns List data
-   * @param element - html element that contains whole list
-   */
-  public pasteHandler(element: PasteEvent['detail']['data']): ListData {
-    const data = this.list!.pasteHandler(element);
-
-    return data;
-  }
-
-  /**
-   * Changes ordered list counterType property value
-   * @param counterType - new value of the counterType value
-   */
-  private changeCounters(counterType: OlCounterType): void {
-    this.list?.changeCounters(counterType);
-
-    (this.data.meta as OrderedListItemMeta).counterType = counterType;
-  }
-
-  /**
-   * Changes ordered list start property value
-   * @param index - new value of the start property
-   */
-  private changeStartWith(index: number): void {
-    this.list?.changeStartWith(index);
-
-    (this.data.meta as OrderedListItemMeta).start = index;
-  }
-
-  /**
-   * This method allows changing tabulator respectfully to passed style
-   */
-  private changeTabulatorByStyle(): void {
-    switch (this.listStyle) {
-      case 'ordered':
-        this.list = new ListTabulator<OrderedListRenderer>({
-          data: this.data,
-          readOnly: this.readOnly,
-          api: this.api,
-          config: this.config,
-          block: this.block,
-        },
-        new OrderedListRenderer(this.readOnly, this.config)
-        );
-
-        break;
-
-      case 'unordered':
-        this.list = new ListTabulator<UnorderedListRenderer>({
-          data: this.data,
-          readOnly: this.readOnly,
-          api: this.api,
-          config: this.config,
-          block: this.block,
-        },
-        new UnorderedListRenderer(this.readOnly, this.config)
-        );
-
-        break;
-
-      case 'checklist':
-        this.list = new ListTabulator<CheckListRenderer>({
-          data: this.data,
-          readOnly: this.readOnly,
-          api: this.api,
-          config: this.config,
-          block: this.block,
-        },
-        new CheckListRenderer(this.readOnly, this.config)
-        );
-
-        break;
-    }
   }
 }

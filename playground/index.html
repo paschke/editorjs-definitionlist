@@ -62,7 +62,7 @@
   <!-- Initialization -->
   <script type="module">
     import EditorJS from '@editorjs/editorjs'
-    import List from '../src/index.ts';
+    import DefinitionList from '../src/index.ts';
 
     /**
      * To initialize the Editor, create a new instance with configuration object
@@ -94,38 +94,25 @@
         /**
          * Each Tool is a Plugin. Pass them via 'class' option with necessary settings {@link docs/tools.md}
          */
-        List: {
-          class: List,
+        DefinitionList: {
+          class: DefinitionList,
           inlineToolbar: true,
           shortcut: 'CMD+SHIFT+L',
           config: {
-            defaultStyle: 'checklist',
-            maxLevel: 4,
+            defaultStyle: 'definition',
           }
         },
       },
       /**
        * Example of the lacalisation dictionary
        */
-      i18n: { 
+      i18n: {
         messages: {
           "toolNames": {
-            "Ordered List": "Ненумерованный список",
-            "Unordered List": "Нумерованный список",
-            "Checklist": "Чеклист",
+            "Definition List": "Definitionsliste",
           },
           "tools": {
-            "List": {
-              "Unordered": "Ненумерованный",
-              "Ordered": "Нумерованный",
-              "Checklist": "Чеклист",
-              "Counter type": "Тип счетчика",
-              "Numeric": "Арабские цифры",
-              "Lower Roman": "Строчные Римские",
-              "Upper Roman": "Заглавные Римские",
-              "Lower Alpha": "Строчные Буквы",
-              "Upper Alpha": "Заглавные Буквы",
-              "Start with": "Начиная с"
+            "DefinitionList": {
             }
           },
         },
@@ -142,114 +129,25 @@
       data: {
         blocks: [
           {
-            type: 'List',
+            type: 'DefinitionList',
             data: {
-              style: 'ordered',
-              meta: {
-                start: 2,
-              },
+              style: 'definition',
               items: [
                 {
-                  content: "Canon",
-                  items: [
-                    {
-                      content: "Fisheye",
-                      items: [
-                        {
-                          content: "Canon 15mm f/2.8",
-                          items: []
-                        }
-                      ]
-                    },
-                    {
-                      content: "Normal",
-                      items: [
-                        {
-                          content: "Canon 40mm f/2.8",
-                          items: []
-                        },
-                        {
-                          content: "Canon 50mm f/1.8",
-                          items: []
-                        }
-                      ]
-                    },
-                    {
-                      content: "Zoom",
-                      items: []
-                    }
-                  ]
+                  term: "Baujahr / Erbauer",
+                  description: "1912 SIG / MFO",
                 },
                 {
-                  content: "",
-                  items: [
-                    {
-                      content: "Canon 75-300mm f/4-5.6",
-                      items: []
-                    }
-                  ]
+                  term: "Länge über Puffer",
+                  description: "11,53 m",
                 },
                 {
-                  content: "Tamron",
-                  items: [
-                    {
-                      content: "Zoom",
-                      items: [
-                        {
-                          content: "Tamron 28-75mm f/2.8",
-                          items: []
-                        }
-                      ]
-                    }
-                  ]
+                  term: "Breite",
+                  description: "2,20 m (typisches Strassenbahn-Fahrzeug)",
                 },
-                {
-                  content: "Samyang",
-                  items: [
-                    {
-                      content: "Wide",
-                      items: [
-                        {
-                          content: "Samyang 14mm f/2.8",
-                            items: []
-                        }
-                      ]
-                    }
-                  ]
-                }
               ]
             }
           },
-          {
-            type : 'List',
-            data : {
-            style : "checklist",
-            items : [
-              "This is old List tool data",
-              "That would be displayed",
-              "In new List tool"
-              ],
-            },
-          },
-          {
-            type: 'List',
-            data: {
-              items: [
-                {
-                  text: "This is Checklist tool data",
-                  checked: true
-                },
-                {
-                  text: "That would be displayed",
-                  checked: false
-                },
-                {
-                  text: "In new List tool",
-                  checked: true
-                }
-              ]
-            }
-          }
         ],
       },
       onReady: function(){
