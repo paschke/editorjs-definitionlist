@@ -78,6 +78,12 @@
   resolved "https://registry.yarnpkg.com/@editorjs/helpers/-/helpers-1.0.1.tgz#e96f7d485c15f563e69c37bd82282c148e0187cc"
   integrity sha512-Lmr8ImoQvoROXtzhsIJsA1ZtXzH46DmE6O8hMjn9/AvQq62UfjREjn+Ewi6KxjIZMay2PsgDEbLlsVyNJGEaxw==
 
+"@editorjs/list@https://github.com/paschke/editorjs-definitionlist":
+  version "2.0.9"
+  resolved "https://github.com/paschke/editorjs-definitionlist#0d915619cd09e1f99baabc8adc6772d0f99a50dc"
+  dependencies:
+    "@codexteam/icons" "^0.3.2"
+
 "@es-joy/jsdoccomment@~0.46.0":
   version "0.46.0"
   resolved "https://registry.yarnpkg.com/@es-joy/jsdoccomment/-/jsdoccomment-0.46.0.tgz#47a2ee4bfc0081f252e058272dfab680aaed464d"

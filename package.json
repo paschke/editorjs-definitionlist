@@ -1,5 +1,5 @@
 {
-  "name": "@editorjs/list", 
+  "name": "@editorjs/list",
   "version": "2.0.9",
   "keywords": [
     "codex editor",
@@ -31,11 +31,11 @@
     "lint:fix": "eslint --fix"
   },
   "devDependencies": {
+    "@editorjs/caret": "^1.0.3",
+    "@editorjs/dom": "^1.0.1",
     "@editorjs/editorjs": "^2.31.0-rc.2",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
-    "@editorjs/caret": "^1.0.3",
-    "@editorjs/dom": "^1.0.1",
     "eslint": "^9.2.0",
     "eslint-config-codex": "^2.0.0",
     "eslint-import-resolver-alias": "1.1.2",
@@ -47,6 +47,7 @@
     "vite-plugin-dts": "^3.9.1"
   },
   "dependencies": {
-    "@codexteam/icons": "^0.3.2"
+    "@codexteam/icons": "^0.3.2",
+    "@editorjs/list": "https://github.com/paschke/editorjs-definitionlist"
   }
 }

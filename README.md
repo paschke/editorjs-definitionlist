@@ -1,21 +1,13 @@
 ![](https://badgen.net/badge/Editor.js/v2.19.2/blue)
 
-# Editorjs List Tool
+# Editorjs Definition List Tool
 
 ![](assets/readme_image.png)
 
 - 🤩 Part of [Editor.js](https://editorjs.io/) ecosystem.
-- 📂 Nesting.
-- 🔥 Ordered and Unordered lists.
-- ✅ Checklists.
-- 🔢 Customizable start number.
-- 🏛️ Customizable counter type (e.g. `lower-roman`).
-- 🪜 Max nesting level configuration.
-- 📝 Compatible with [List](https://github.com/editor-js/list) and [Checklist](https://github.com/editor-js/checklist).
+- 📝 allows to edit definition lists `<dl><dt><dd>`.
 
-![](assets/demo.gif)
-
-Use `Tab` and `Shift+Tab` keys to create or remove sublist with a padding.
+Use `Tab` to jump from term to description and `Shift+Tab` to jump from description to term.
 
 ## Installation
 
@@ -101,7 +93,7 @@ Object `ItemMeta` for Unordered list would be empty.
 ## Localisation
 If you want to use your language for toolbox items, you can pass i18n dictionary to the editorjs instance below the tools `block`:
 ```javascript
-i18n: { 
+i18n: {
   messages: {
     "toolNames": {
       "Ordered List": "Nummerierte Liste",

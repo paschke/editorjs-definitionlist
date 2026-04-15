@@ -5,11 +5,11 @@ import type {
 } from '@editorjs/editorjs/types/tools';
 import type { ListConfig, ListData } from './types/ListParams';
 import type { DefinitionListItem } from './types/ItemMeta';
+import type { ListRenderer } from './types/ListRenderer';
+import type { PasteEvent } from './types';
 import ListTabulator from './ListTabulator';
 import { DefinitionListRenderer } from './ListRenderer';
-import type { ListRenderer } from './types/ListRenderer';
 import normalizeData from './utils/normalizeData';
-import type { PasteEvent } from './types';
 
 /**
  * Build styles
