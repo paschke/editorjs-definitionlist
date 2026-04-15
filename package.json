@@ -1,5 +1,5 @@
 {
-  "name": "@editorjs/list",
+  "name": "paschke/editorjs-definitionlist",
   "version": "2.0.9",
   "keywords": [
     "codex editor",
@@ -7,9 +7,9 @@
     "editor.js",
     "editorjs"
   ],
-  "description": "List Tool for EditorJS",
-  "repository": "https://github.com/editor-js/list.git",
-  "author": "CodeX <team@codex.so>",
+  "description": "Definition List Tool for EditorJS",
+  "repository": "https://github.com/paschke/editorjs-definitionlist",
+  "author": "Stefan Paschke",
   "license": "MIT",
   "files": [
     "dist"
@@ -47,7 +47,6 @@
     "vite-plugin-dts": "^3.9.1"
   },
   "dependencies": {
-    "@codexteam/icons": "^0.3.2",
-    "@editorjs/list": "https://github.com/paschke/editorjs-definitionlist"
+    "@codexteam/icons": "^0.3.2"
   }
 }

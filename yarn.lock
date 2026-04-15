@@ -84,6 +84,13 @@
   dependencies:
     "@codexteam/icons" "^0.3.2"
 
+"@editorjs/list@https://github.com/paschke/editorjs-definitionlist#main":
+  version "2.0.9"
+  resolved "https://github.com/paschke/editorjs-definitionlist#29aa364876a3cdcde436647d90e1da0c38c4125a"
+  dependencies:
+    "@codexteam/icons" "^0.3.2"
+    "@editorjs/list" "https://github.com/paschke/editorjs-definitionlist"
+
 "@es-joy/jsdoccomment@~0.46.0":
   version "0.46.0"
   resolved "https://registry.yarnpkg.com/@es-joy/jsdoccomment/-/jsdoccomment-0.46.0.tgz#47a2ee4bfc0081f252e058272dfab680aaed464d"
