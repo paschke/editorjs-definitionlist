@@ -25,6 +25,7 @@
   },
   "types": "./dist/index.d.ts",
   "scripts": {
+    "prepare": "vite build",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint",
