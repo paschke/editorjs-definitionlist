@@ -14,12 +14,12 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/editorjs-list.umd.js",
-  "module": "./dist/editorjs-list.mjs",
+  "main": "./dist/editorjs-definition-list.umd.js",
+  "module": "./dist/editorjs-definition-list.mjs",
   "exports": {
     ".": {
-      "import": "./dist/editorjs-list.mjs",
-      "require": "./dist/editorjs-list.umd.js",
+      "import": "./dist/editorjs-definition-list.mjs",
+      "require": "./dist/editorjs-definition-list.umd.js",
       "types": "./dist/index.d.ts"
     }
   },
